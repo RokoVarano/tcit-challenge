@@ -25,11 +25,7 @@ Requisitos: Node.js 22 o superior (lo desarrollé con Node 24) y una base de dat
 
 ### 1. Base de datos
 
-Crea una base de datos PostgreSQL y ejecuta `backend/db/schema.sql` en ella, por ejemplo:
-
-```bash
-psql "<tu connection string>" -f backend/db/schema.sql
-```
+Crea una base de datos PostgreSQL vacía. No hace falta crear la tabla: el backend ejecuta `backend/db/schema.sql` al iniciar, y como usa `CREATE TABLE IF NOT EXISTS`, es seguro hacerlo cada vez.
 
 Yo lo desarrollé contra PostgreSQL en Supabase; funciona igual con un PostgreSQL local.
 
@@ -83,7 +79,19 @@ Ejemplo de post:
 - **camelCase en el JSON, snake_case en SQL.** La columna `created_at` se expone como `createdAt`; la conversión está en un solo lugar (`toPost` en `backend/src/index.js`).
 - **Consultas parametrizadas** (`$1`, `$2`) en todas las rutas, para evitar inyección SQL.
 - **SSL.** Con `DATABASE_SSL=true` la conexión va cifrada pero no verifica el certificado (`rejectUnauthorized: false`), porque Supabase usa su propia autoridad certificadora. En producción configuraría el certificado CA de Supabase para verificarlo.
+- **La tabla se crea al iniciar el servidor.** Para un challenge de una sola tabla es lo más simple de ejecutar. En un proyecto real usaría migraciones (por ejemplo `node-pg-migrate`), para versionar cada cambio del esquema.
 - **Supuestos:** el nombre es obligatorio; la descripción es opcional.
+
+## Uso de IA
+
+Usé Claude (Claude Code) como apoyo durante todo el desarrollo, de la forma en que lo usaría en un equipo:
+
+- **Para aprender y repasar.** Venía de varios años con Vue y Pinia, y tenía oxidados Redux y el backend en Node. Le pedí que me explicara cada concepto (slices, thunks, `extraReducers`, middlewares de Express, consultas parametrizadas) antes de usarlo, y escribí el código yo mismo a partir de esas explicaciones y ejemplos.
+- **Como revisor.** Después de cada paso revisaba mi código y me señalaba errores, que corregí yo: comparar ids de tipo string con number, un `filter` sin asignar, una ruta registrada como `post` en vez de `delete`.
+- **Para detectar problemas que no eran obvios:** la doble llamada de `StrictMode` (que llevó a usar `condition` en el thunk), el `NULL` en la descripción que rompía el `NOT NULL` de la columna, y la conexión directa de Supabase que solo funciona por IPv6.
+- **Para tareas de apoyo:** redactó este README, los estilos de `App.css` y la creación automática de la tabla al iniciar. Los revisé y puedo explicar cada línea.
+
+Las decisiones (qué incluir, qué dejar fuera, cómo cumplir cada requisito) fueron mías.
 
 ## Con más tiempo agregaría
 

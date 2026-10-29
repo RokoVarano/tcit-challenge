@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import express from 'express'
 import cors from 'cors'
 import { pool } from './db.js'
@@ -52,6 +53,10 @@ app.delete('/posts/:id', async (req, res) => {
 
   res.json(toPost(result.rows[0]))
 })
+
+// create the posts table if it doesn't exist yet
+const schema = await readFile(new URL('../db/schema.sql', import.meta.url), 'utf8')
+await pool.query(schema)
 
 app.listen(3000, () => {
   console.log('API listening on http://localhost:3000')
