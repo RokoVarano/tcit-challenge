@@ -43,15 +43,15 @@ function App() {
           />
           <button type='button' onClick={() => setFilter(searchText)}>Buscar</button>
         </section>
-        <section className='create_post'>
-          <input type="text" placeholder='Nombre del Post' value={newPostName} onChange={e => setNewPostName(e.target.value)}/>
-          <input type="text" placeholder='Descripcion' value={newPostDescription} onChange={e => setNewPostDescription(e.target.value)}/>
-          <button className='create_post_btn' onClick={() => dispatchNewPost()}>Create Post</button>
-        </section>
         <section className='post_list'>
           {
             shownPosts.map(post => <PostCard key={post.id} post={post} />)
           }
+        </section>
+        <section className='create_post'>
+          <input type="text" placeholder='Nombre del Post' value={newPostName} onChange={e => setNewPostName(e.target.value)}/>
+          <input type="text" placeholder='Descripción' value={newPostDescription} onChange={e => setNewPostDescription(e.target.value)}/>
+          <button type='button' className='create_post_btn' onClick={() => dispatchNewPost()}>Crear</button>
         </section>
       </main>
 
